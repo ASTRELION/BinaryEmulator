@@ -53,7 +53,7 @@ const enum instructionFormats {
 } instructionFormats;
 
 /** Instruction format for each instruction */
-int instructionFormat[] = {
+const int instructionFormat[] = {
     fR, // ADD
     fI, // ADDI
     fR, // AND
@@ -94,7 +94,7 @@ int instructionFormat[] = {
 };
 
 /** Opcode for each instruction */
-char* opcodes[] = {
+const char* opcodes[] = {
     "10001011000",  // ADD
     "1001000100",   // ADDI
     "10001010000",  // AND
@@ -132,6 +132,46 @@ char* opcodes[] = {
     "1110101000",   // SUBS
     "10011010110",  // UDIV
     "10011011110"   // UMULH
+};
+
+const char* instructionStrings[] = {
+    "ADD",
+    "ADDI",
+    "AND",
+    "ANDI",
+    "B",
+    "Bcond",
+    "BL",
+    "BR",
+    "CBNZ",
+    "CBZ",
+    "DUMP",
+    "EOR",
+    "EORI",
+    "HALT",
+    "LDUR",
+    "LDURB",
+    "LDURH",
+    "LDURSW",
+    "LSL",
+    "LSR",
+    "MUL",
+    "ORR",
+    "ORRI",
+    "PRNL",
+    "PRNT",
+    "SDIV",
+    "SMULH",
+    "STUR",
+    "STURB",
+    "STURH",
+    "STURW",
+    "SUB",
+    "SUBI",
+    "SUBIS",
+    "SUBS",
+    "UDIV",
+    "UMULH"
 };
 
 #endif

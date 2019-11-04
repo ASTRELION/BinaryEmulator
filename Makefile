@@ -15,4 +15,4 @@ $(BIN): $(OBJS)
 	$(CC) $(CFLAGS) -c $<  -o $@ 
 
 clean:
-	rm -f *.o main 
+	rm -f *.o vgcore.* main 

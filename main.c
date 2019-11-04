@@ -13,7 +13,7 @@
  */
 char* int32tobin(uint32_t n, bool useSpace)
 {
-    char* binary = malloc(37); // 4 for num 1 for \0
+    char* binary = malloc(sizeof(char) * (32 + 4));
     for (int i = 31; i >= 0; i--)
     {
         int k = n >> i;
@@ -35,6 +35,41 @@ char* int32tobin(uint32_t n, bool useSpace)
     return binary;
 }
 
+/**
+ * Returns instruction number based on given opcode
+ */
+int findInstruction(char* binary)
+{
+    char* result = NULL;
+    int index = -1;
+    for (int o = 0; o < sizeof(opcodes) / sizeof(opcodes[0]); o++)
+    {
+        char* opcode = malloc(sizeof(opcodes[o]));
+        strcpy(opcode, opcodes[o]);
+        bool validOpcode = true;
+
+        for (int b = 0; b < strlen(opcode); b++)
+        {
+            if(opcode[b] != binary[b])
+            {
+                validOpcode = false;
+                break;
+            }
+        }
+
+        if (validOpcode)
+        {
+            if (result == NULL || strlen(opcode) < strlen(result))
+            {
+                index = o;
+                result = opcode;
+            }
+        }
+    }
+
+    return index;
+}
+
 int main()
 {
     FILE *file = fopen("test.legv8asm.machine", "r"); // Open file
@@ -49,25 +84,24 @@ int main()
     uint32_t instr;
     while (fread(&instr, sizeof(uint32_t), 1, file))
     {   
-        instr = be32toh(instr);
+        instr = be32toh(instr); // Convert instruction to host endian-ness
         instructions[i] = instr;
         i++;
     }
     
-    printf("%s", opcodes[0]);
+    // Print file stats
     printf("File Size: %u bytes\n", fileLength);
     printf("Instruction Count: %u\n", fileLength / 4);
     printf("\nInstructions: \n");
 
-    for (int i = 0; i < sizeof(instructions) / 4; i++)
+    // Print Instructions
+    for (int i = 0; i < sizeof(instructions) / sizeof(instructions[0]); i++)
     {
-        printf("%x ", instructions[i]);
+        char* binary = int32tobin(instructions[i], false);
+        printf("%s\t", instructionStrings[findInstruction(binary)]);
+        printf("%x\t", instructions[i]);
         printf("%s\n", int32tobin(instructions[i], true));
     }
-
-    FILE* test = fopen("test.machine", "wb");
-    uint32_t j = 3;
-    fwrite(&j, sizeof(j), 1, test);
  
     return 0;
 }

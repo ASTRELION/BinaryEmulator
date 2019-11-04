@@ -1,3 +1,4 @@
 ADDI X0, XZR, #1
+test:
 ADDI X0, XZR, #2
 DUMP
