@@ -15,4 +15,4 @@ $(BIN): $(OBJS)
 	$(CC) $(CFLAGS) -c $<  -o $@ 
 
 clean:
-	rm $(BIN); find . -type f -name '*.o' -delete
+	rm -f *.o main 
