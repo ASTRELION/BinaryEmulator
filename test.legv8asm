@@ -1,0 +1,3 @@
+ADDI X0, XZR, #1
+ADDI X0, XZR, #2
+DUMP
