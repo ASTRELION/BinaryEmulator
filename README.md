@@ -11,4 +11,4 @@
 3. Compile; `make`
 4. Create/modify `test.legv8asm` to include assembly instructions
 5. Run `./legv8asm test.legv8asm -a` to assemble program into binary. A file named `test.legv8asm.machine` will be generated as a binary file
-6. Run `./main` to run `test.legv8asm.machine` and observe output
+6. Run `./main` to run `test.legv8asm.machine` as binary assembly code and observe output
