@@ -1,6 +1,7 @@
 # Custom
 main
 vgcore.*
+*.legv8asm.machine
 
 # Prerequisites
 *.d
