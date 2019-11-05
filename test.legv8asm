@@ -1,4 +1,7 @@
-ADDI X0, XZR, #1
+ADDI X2, XZR, #5
+ADD X1, X2, X2
 test:
-ADDI X0, XZR, #2
+SUBI X2, X20, #1
+STUR X2, [X5, #8]
+CBNZ X2, test
 DUMP
