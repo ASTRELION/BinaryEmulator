@@ -78,7 +78,7 @@ struct MachineState
     } instructionNames;
 
     const enum Conditions {
-        cEG,
+        cEQ,
         cNE,
         cHS,
         cLO,

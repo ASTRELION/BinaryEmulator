@@ -142,12 +142,12 @@ int32_t runInstruction(uint32_t instruction)
         case ORRI: // ORRI
             return 1;
 
-        case PRNL: // PRNL
+        case PRNL: // Prints a blank line
         {
             puts("");
             return 1;
         }
-        case PRNT: // PRNT
+        case PRNT: // Prints out a register
         {
             uint32_t rd = reg[0];
             printf("X%d\t%x\t%d", rd, machineState.registers[rd], machineState.registers[rd]);
@@ -177,8 +177,14 @@ int32_t runInstruction(uint32_t instruction)
             return 1;
         }
         case SUB: // SUB
+        {
+            int32_t rd = reg[0];
+            int32_t rn = reg[1];
+            int32_t rm = reg[2];
+            int32_t result = machineState.registers[rn] - machineState.registers[rm];
+            machineState.registers[rd] = result;
             return 1;
-
+        }
         case SUBI: // SUBI
         {
             int32_t rd = reg[0];
@@ -192,7 +198,9 @@ int32_t runInstruction(uint32_t instruction)
             int32_t rd = reg[0];
             int32_t rn = reg[1];
             int32_t im = reg[2];
-            machineState.registers[rd] = machineState.registers[rn] - im;
+            int32_t result = machineState.registers[rn] - im;
+            machineState.registers[rd] = result;
+            setConditionRegisters(result);
             return 1;
         }
         case SUBS: // SUBS
@@ -200,7 +208,9 @@ int32_t runInstruction(uint32_t instruction)
             int32_t rd = reg[0];
             int32_t rn = reg[1];
             int32_t rm = reg[2];
-            machineState.registers[rd] = machineState.registers[rn] - machineState.registers[rm];
+            int32_t result = machineState.registers[rn] - machineState.registers[rm];
+            machineState.registers[rd] = result;
+            setConditionRegisters(result);
             return 1;
         }
         case UDIV: // UDIV
@@ -231,6 +241,65 @@ void printDump()
         printf("%s\t", int32tobin(machineState.registers[i], false));
         printf("%d\t", machineState.registers[i]);
         puts("");
+    }
+}
+
+/** Sets the condition registers based on given subtraction result */
+void setConditionRegisters(int32_t result)
+{
+    // Reset all condition registers
+    for (int i = cEQ; i <= cVS; i++)
+    {
+        machineState.conditionRegisters[i] = 0;
+    }
+
+    if (result == 0)
+    {
+        machineState.conditionRegisters[cEQ] = 1;
+    }
+    if (result >= 0)
+    {
+        machineState.conditionRegisters[cGE] = 1;
+    }
+    if (result > 0)
+    {
+        machineState.conditionRegisters[cGT] = 1;
+    }
+    if (result > 0)
+    {
+        machineState.conditionRegisters[cHI] = 1;
+    }
+    if (result >= 0)
+    {
+        machineState.conditionRegisters[cHS] = 1;
+    }
+    if (result <= 0)
+    {
+        machineState.conditionRegisters[cLE] = 1;
+    }
+    if (result < 0)
+    {
+        machineState.conditionRegisters[cLO] = 1;
+    }
+    if (result <= 0)
+    {
+        machineState.conditionRegisters[cLS] = 1;
+    }
+    if (result < 0)
+    {
+        machineState.conditionRegisters[cLT] = 1;
+    }
+    if (result < 0)
+    {
+        machineState.conditionRegisters[cMI] = 1;
+    }
+    if (result != 0)
+    {
+        machineState.conditionRegisters[cNE] = 1;
+    }
+    if (result >= 0)
+    {
+        machineState.conditionRegisters[cPL] = 1;
     }
 }
 
@@ -319,6 +388,7 @@ uint32_t* parseRegisters(uint32_t instruction)
     switch (format)
     {
         case fR: // 11 opcode, 5 Rm, 6 shamt, 5 Rn, 5 Rd
+        {
             rd = instruction & 0b11111;
             rn = (instruction >> 5) & 0b11111;
             shamt = (instruction >> (5 + 5)) & 0b111111;
@@ -328,8 +398,9 @@ uint32_t* parseRegisters(uint32_t instruction)
             reg[2] = rm;
             reg[3] = shamt;
             break;
-        
+        }
         case fI: // 10 opcode, 12 immediate, 5 Rn, 5 Rd
+        {
             rd = instruction & 0b11111;
             rn = (instruction >> 5) & 0b11111;
             im = (instruction >> (5 + 5)) & 0b111111111111;
@@ -337,8 +408,9 @@ uint32_t* parseRegisters(uint32_t instruction)
             reg[1] = rn;
             reg[2] = im;
             break;
-
+        }
         case fD: // 11 opcode, 9 address (offset), 2 op, 5 Rn, 5 Rt
+        {
             rd = instruction & 0b11111;
             rn = (instruction >> 5) & 0b11111;
             adr = (instruction >> (5 + 5 + 2)) & 0b111111111;
@@ -346,13 +418,20 @@ uint32_t* parseRegisters(uint32_t instruction)
             reg[1] = rn;
             reg[2] = adr;
             break;
-
+        }
         case fB: // 6 opcode, 26 address
+        {
             adr = instruction & 0b11111111111111111111111111;
+            // Check for negative
+            if ((instruction >> 5) & 0b10000000000000000000000000)
+            {
+                adr = -((~instruction >> 5) & 0b01111111111111111111111111) - 1;
+            }
             reg[0] = adr;
             break;
-
+        }
         case fCB: // 8 opcode, 19 address, 5 Rt
+        {
             rd = instruction & 0b11111;
             adr = (instruction >> 5) & 0b1111111111111111111;
             // Check for negative
@@ -363,14 +442,17 @@ uint32_t* parseRegisters(uint32_t instruction)
             reg[0] = rd;
             reg[1] = adr;
             break;
-
+        }
         case fIW: // 11 opcode, 16 immediate, 5 Rd
+        {
             rd = instruction & 0b11111;
             im = (instruction >> 5) & 0b1111111111111111;
             break;
-
+        }
         default:
+        {
             break;
+        }
     }
 
     return reg;
