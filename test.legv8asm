@@ -1,7 +1,15 @@
 ADDI X2, XZR, #5
 ADD X1, X2, X2
+ADDI X2, X2, #1
+ADDI X5, XZR, #10
+SUBI X5, X5, #1
+SUBI X5, X5, #1
+SUBI X5, X5, #5
 test:
-SUBI X2, X20, #1
-STUR X2, [X5, #8]
+SUBI X2, X2, #1
+SUBI X1, X1, #1
+SUBI X1, X1, #1
 CBNZ X2, test
+done:
+
 DUMP

@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Werror
 
 BIN = main
-SRCS = main.c machine.c
+SRCS = main.c machine.c instructionUtil.c
 
 OBJS = $(SRCS:.c=.o)
 

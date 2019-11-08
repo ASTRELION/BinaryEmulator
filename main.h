@@ -3,6 +3,6 @@
 
 #include "machine.h"
 
-
+struct MachineState machineState;
 
 #endif
